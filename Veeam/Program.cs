@@ -3,5 +3,11 @@
 using Veeam;
 
 
+ConsoleInput consoleInput = new ConsoleInput();
 
+Repository repository = consoleInput.CreateRepository();
+
+Synchronizer synchronizer = new Synchronizer(repository);
+
+await synchronizer.SynchronizeFolders();
 
