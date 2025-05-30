@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36121.58 d17.14
+VisualStudioVersion = 17.14.36121.58
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Veeam", "Veeam.csproj", "{CCD70929-7A72-2748-91D1-EF0A52BE88FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Veeam.Tests", "..\Veeam.Tests\Veeam.Tests.csproj", "{E90C24D3-7FAD-453A-BEDC-7C0EEF860D20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{CCD70929-7A72-2748-91D1-EF0A52BE88FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCD70929-7A72-2748-91D1-EF0A52BE88FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCD70929-7A72-2748-91D1-EF0A52BE88FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E90C24D3-7FAD-453A-BEDC-7C0EEF860D20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E90C24D3-7FAD-453A-BEDC-7C0EEF860D20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E90C24D3-7FAD-453A-BEDC-7C0EEF860D20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E90C24D3-7FAD-453A-BEDC-7C0EEF860D20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
