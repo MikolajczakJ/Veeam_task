@@ -2,16 +2,14 @@
 
 using Veeam;
 
-Repository repository = ConsoleInput.CreateRepository();
-if (repository == null)
+Repository? repository = null; ;
+do
 {
-    Console.WriteLine("Failed to create repository. Exiting.");
-    return;
-}
-else
-{
-    SynchronizationChecker checker = new SynchronizationChecker(repository);
-    await checker.StartChecking();
-}
+    repository= ConsoleManager.CreateRepository().IsCreatedCorrectly();
+
+} while (repository is null);
+
+SynchronizationChecker checker = new SynchronizationChecker(repository!);
+await checker.StartChecking();
 
 
