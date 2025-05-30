@@ -10,19 +10,24 @@ namespace Veeam
 {
     public static class ConsoleManager
     {
-        private static readonly string _directoryMessage = "Enter the directory path: ";
-        private static readonly string _replicaMessage = "Enter the directory path: ";
-        private static readonly string _logMessage = "Enter the log file path: ";
-        private static readonly string _checkIntervalMessage = "Enter the check interval (e.g., 00:05:00 for 5 minutes): ";
+        /// <summary>
+        /// Creates a new instance of the <see cref="Repository"/> class with user-specified configuration.
+        /// </summary>
+        /// <remarks>This method prompts the user to provide paths for the source directory, replica
+        /// directory, and log directory, as well as a time interval for periodic checks. If an error occurs during the
+        /// setup process, the method logs the error message to the console and returns <see
+        /// langword="null"/>.</remarks>
+        /// <returns>A new <see cref="Repository"/> instance configured with the specified directories and check interval, or
+        /// <see langword="null"/> if an error occurs during the setup process.</returns>
         public static Repository? CreateRepository()
         {
             try
             {
-                string? sourceDirectory = SetupDirectory(_directoryMessage);
-                string? replicaDirectory = SetupDirectory(_replicaMessage);
-                string? logDirectory = SetupDirectory(_logMessage);
+                string sourceDirectory = SetupDirectory("Enter the source path: ");
+                string replicaDirectory = SetupDirectory("Enter the copy path: ");
+                string logDirectory = SetupDirectory("Enter the log file path: ");
 
-                TimeSpan checkInterval = GetTimeSpan(_checkIntervalMessage);
+                TimeSpan checkInterval = GetTimeSpan("Enter the check interval (e.g., 00:05:00 for 5 minutes): ");
 
                 return new Repository(sourceDirectory, replicaDirectory, logDirectory, checkInterval);
             }
@@ -32,13 +37,19 @@ namespace Veeam
                 return null;
             }
         }
-        private static string? SetupDirectory(string message)
+        /// <summary>
+        /// Prompts the user to specify a directory path, validates it, and ensures the directory exists.
+        /// </summary>
+        /// <remarks>If the specified directory does not exist, the user is given the option to create it.
+        /// If the user declines, the operation is cancelled, and an empty string is returned.</remarks>
+        /// <param name="message">The message to display when prompting the user for a directory path.</param>
+        /// <returns>The absolute path of the directory specified by the user.  Returns an empty string if the operation is
+        /// cancelled by the user.</returns>
+        private static string SetupDirectory(string message)
         {
-            string directory = GetDirectory(message);
-            if (!directory.IsValidAbsoluteDirectoryPath())
-            {
-                return null;
-            }
+            string directory = GetUserInput(message);
+            directory.IsValidAbsoluteDirectoryPath();
+
             if (!Directory.Exists(directory))
             {
                 if (GetUserConfirmation($"Directory '{directory}' does not exist. Would you like to create it?"))
@@ -53,14 +64,24 @@ namespace Veeam
                 }
             }
             return directory;
-
         }
-        private static string GetDirectory(string message)
+
+        /// <summary>
+        /// Prompts the user with a specified message and retrieves their input.
+        /// </summary>
+        /// <param name="message">The message to display to the user as a prompt.</param>
+        /// <returns>The input entered by the user as a string. If the user provides no input, an empty string is returned.</returns>
+        private static string GetUserInput(string message)
         {
             Console.Write(message);
-            string? directory = Console.ReadLine();
-            return directory ?? string.Empty;
+            string? intpur = Console.ReadLine();
+            return intpur ?? string.Empty;
         }
+        /// <summary>
+        /// Prompts the user with a message and retrieves a confirmation response.
+        /// </summary>
+        /// <param name="message">The message to display to the user, asking for confirmation.</param>
+        /// <returns><see langword="true"/> if the user responds with "y" (case-insensitive); otherwise, <see langword="false"/>.</returns>
 
         private static bool GetUserConfirmation(string message)
         {
@@ -68,6 +89,17 @@ namespace Veeam
             string? response = Console.ReadLine();
             return response?.Trim().ToLower() == "y";
         }
+        /// <summary>
+        /// Determines whether the specified string is a valid absolute directory path.
+        /// </summary>
+        /// <remarks>On Windows, the path must be rooted to a drive letter (e.g., "C:\"), and
+        /// platform-specific path validation is applied.</remarks>
+        /// <param name="path">The path to validate.</param>
+        /// <returns><see langword="true"/> if the specified path is a valid absolute directory path; otherwise, <see
+        /// langword="false"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="path"/> is <see langword="null"/>, empty, contains invalid characters, is not an
+        /// absolute path, or does not conform to platform-specific requirements (e.g., drive letter rooting on
+        /// Windows).</exception>
         private static bool IsValidAbsoluteDirectoryPath(this string path)
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -75,25 +107,26 @@ namespace Veeam
             if (path.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
                 throw new ArgumentException("Path contains invalid characters.");
 
-            try
-            {
-                if (!Path.IsPathRooted(path))
-                    throw new ArgumentException("Path must be absolute.");
+            if (!Path.IsPathRooted(path))
+                throw new ArgumentException("Path must be absolute.");
 
-                if (OperatingSystem.IsWindows())
-                {
-                    var root = Path.GetPathRoot(path);
-                    if (string.IsNullOrEmpty(root) || !Regex.IsMatch(root, @"^[A-Za-z]:\\$"))
-                        throw new ArgumentException("Path must be rooted to a drive letter (e.g., C:\\).");
-                }
-
-                return true;
-            }
-            catch(Exception ex)
+            if (OperatingSystem.IsWindows())
             {
-                throw ex;
+                var root = Path.GetPathRoot(path);
+                if (string.IsNullOrEmpty(root) || !Regex.IsMatch(root, @"^[A-Za-z]:\\$"))
+                    throw new ArgumentException("Path must be rooted to a drive letter (e.g., C:\\).");
             }
+
+            return true;
         }
+        /// <summary>
+        /// Determines whether the specified <see cref="Repository"/> instance was created successfully.
+        /// </summary>
+        /// <remarks>This method logs a message to the console indicating whether the repository was
+        /// created successfully or not.</remarks>
+        /// <param name="repository">The <see cref="Repository"/> instance to validate. Can be <see langword="null"/>.</param>
+        /// <returns>The same <see cref="Repository"/> instance if it is not <see langword="null"/>; otherwise, <see
+        /// langword="null"/>.</returns>
         public static Repository? IsCreatedCorrectly(this Repository? repository)
         {
             if (repository is null)
@@ -103,13 +136,17 @@ namespace Veeam
             else
             {
                 Console.WriteLine("Repository created successfully.");
-                Console.WriteLine($"Source Directory: {repository.SourceDirectory}");
-                Console.WriteLine($"Replica Directory: {repository.ReplicaDirectory}");
-                Console.WriteLine($"Log Directory: {repository.LogDirectory}");
-                Console.WriteLine($"Check Interval: {repository.CheckInterval}");
+                Console.WriteLine(repository);
             }
             return repository;
         }
+        /// <summary>
+        /// Prompts the user for a <see cref="TimeSpan"/> input and parses it.
+        /// </summary>
+        /// <remarks>If the user provides an invalid <see cref="TimeSpan"/> format, a message is
+        /// displayed, and the default value of 5 minutes is returned.</remarks>
+        /// <param name="message">The message to display to the user when prompting for input.</param>
+        /// <returns>The parsed <see cref="TimeSpan"/> value if the input is valid; otherwise, a default value of 5 minutes.</returns>
         private static TimeSpan GetTimeSpan(string message)
         {
             Console.Write(message);

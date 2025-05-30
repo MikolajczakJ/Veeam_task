@@ -20,6 +20,13 @@ namespace Veeam
                 File.Create(_logFilePath).Dispose();
             }
         }
+        /// <summary>
+        /// Asynchronously writes a log message to the log file and outputs it to the console.
+        /// </summary>
+        /// <remarks>The log entry includes a timestamp in the format of the current system date and time.
+        /// If an error occurs while writing to the log file, the exception message is written to the console.</remarks>
+        /// <param name="message">The message to log. Cannot be null or empty.</param>
+        /// <returns></returns>
         public async Task Log(string message)
         {
             string log = string.Empty;

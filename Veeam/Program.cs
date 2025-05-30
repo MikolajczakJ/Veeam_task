@@ -3,10 +3,10 @@
 using Veeam;
 
 Repository? repository = null; ;
+//Repository creation loop until a repository with valid directories is created
 do
 {
     repository= ConsoleManager.CreateRepository().IsCreatedCorrectly();
-
 } while (repository is null);
 
 SynchronizationChecker checker = new SynchronizationChecker(repository!);
