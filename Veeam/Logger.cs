@@ -8,12 +8,10 @@ namespace Veeam
 {
     public class Logger
     {
-        private readonly Repository _repository;
         private readonly string _logFileName;
         private string _logFilePath;
         public Logger(Repository repository)
         {
-            _repository = repository;
             _logFilePath = repository.LogDirectory;
             _logFileName = new DirectoryInfo(repository.SourceDirectory).Name;
             _logFilePath = Path.Combine(_logFilePath, $"{_logFileName}_logs.log");
@@ -24,11 +22,14 @@ namespace Veeam
         }
         public async Task Log(string message)
         {
+            string log = string.Empty;
             try
             {
                 using (var writer = new StreamWriter(_logFilePath, true))
                 {
-                    await writer.WriteLineAsync($"{DateTime.Now}: {message}");
+                    log = $"{DateTime.Now}: {message}";
+                    await writer.WriteLineAsync(log);
+                    Console.WriteLine(log);
                 }
             }
             catch (Exception ex)

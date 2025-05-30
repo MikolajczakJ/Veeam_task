@@ -6,21 +6,26 @@ using System.Threading.Tasks;
 
 namespace Veeam
 {
-    public class ConsoleInput
+    public static class ConsoleInput
     {
-        public Repository CreateRepository()
+        public static Repository? CreateRepository()
         {
             string sourceDirectory = SetupDirectory("Enter the source directory path: ");
             
             string replicaDirectory = SetupDirectory("Enter the replica directory path: ");
             
             string logDirectory = SetupDirectory("Enter the log file path: ");
+            if(string.IsNullOrEmpty(logDirectory) || string.IsNullOrEmpty(replicaDirectory) || string.IsNullOrEmpty(sourceDirectory))
+            {
+                Console.WriteLine("Directories cannot be empty. Exiting.");
+                return null;
+            }
 
             TimeSpan checkInterval = GetTimeSpan("Enter the check interval (e.g., 00:05:00 for 5 minutes): ");
 
             return new Repository(sourceDirectory, replicaDirectory, logDirectory, checkInterval);
         }
-        private string SetupDirectory(string message)
+        private static string SetupDirectory(string message)
         {
             string directory = GetDirectory(message);
             if (!Directory.Exists(directory))
@@ -39,14 +44,14 @@ namespace Veeam
             return directory;
 
         }
-        private string GetDirectory(string message)
+        private static string GetDirectory(string message)
         {
             Console.Write(message);
             string? directory = Console.ReadLine();
             return directory ?? string.Empty;
         }
 
-        private bool GetUserConfirmation(string message)
+        private static bool GetUserConfirmation(string message)
         {
             Console.Write(message + " (y/n): ");
             string? response = Console.ReadLine();

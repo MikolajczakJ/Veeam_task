@@ -33,7 +33,6 @@ namespace Veeam
         }
         private string[] GetFiles(string directory) => Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
 
-        //TODO: Implement logging to the log file specified in the repository
         private async Task CheckForAdded(string sourceFile)
         {
             string relativePath = Path.GetRelativePath(_repository.SourceDirectory, sourceFile);
@@ -56,15 +55,6 @@ namespace Veeam
             }
         }
 
-        private string ComputeMD5(string filePath)
-        {
-            using (var md5 = MD5.Create())
-            using (var stream = File.OpenRead(filePath))
-            {
-                byte[] hash = md5.ComputeHash(stream);
-                return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-            }
-        }
 
         private async Task CheckForRemoved(string replicaFile)
         {
@@ -75,6 +65,15 @@ namespace Veeam
             {
                 File.Delete(replicaFile);
                 await _logger.Log($"Deleted file: {relativePath}");
+            }
+        }
+        private string ComputeMD5(string filePath)
+        {
+            using (var md5 = MD5.Create())
+            using (var stream = File.OpenRead(filePath))
+            {
+                byte[] hash = md5.ComputeHash(stream);
+                return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
             }
         }
     }
